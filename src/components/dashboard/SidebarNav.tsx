@@ -23,6 +23,7 @@ import {
   ScanLine,
 } from 'lucide-react';
 import { Separator } from '../ui/separator';
+import { FinClubLogo } from '../logo/FinClubLogo';
 
 const menuItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -41,11 +42,8 @@ export function SidebarNav() {
   return (
     <>
       <SidebarHeader>
-        <div className="flex items-center gap-2 p-2">
-          <ShieldCheck className="h-8 w-8 text-primary" />
-          <span className="text-xl font-semibold text-sidebar-foreground group-data-[collapsible=icon]:hidden">
-            Netskrill
-          </span>
+        <div className="flex items-center gap-2 p-2 justify-center">
+          <FinClubLogo className="h-8 w-auto text-primary" />
         </div>
       </SidebarHeader>
       <SidebarContent>

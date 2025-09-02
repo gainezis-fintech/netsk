@@ -49,8 +49,9 @@ export function VirtualCard() {
   const [payPassEnabled, setPayPassEnabled] = useState(false);
   const { toast } = useToast();
   
-  // We use useState to ensure the card number is only generated once per component mount
   const [visaNumber] = useState(generateVisaNumber());
+  const [expiryDate] = useState("10/28");
+  const [cvv] = useState("352");
 
   const handlePayPassToggle = (enabled: boolean) => {
     setPayPassEnabled(enabled);
@@ -69,30 +70,34 @@ export function VirtualCard() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="relative aspect-[1.586] w-full max-w-sm mx-auto rounded-xl bg-gradient-to-br from-gray-900 via-blue-900 to-slate-900 text-slate-300 p-6 flex flex-col justify-between shadow-2xl">
+        <div className="relative aspect-[1.586] w-full max-w-sm mx-auto rounded-xl bg-gradient-to-br from-slate-900 via-blue-900 to-gray-800 text-slate-300 p-6 flex flex-col justify-between shadow-2xl">
+          {/* Header */}
           <div className="flex justify-between items-start">
-            <div className='flex items-center gap-2'>
-              <FinClubLogo className="w-10 h-10 text-blue-400" />
-              <div>
-                <span className="font-bold text-lg text-blue-400">FINCLUB</span>
-                <p className='text-xs text-slate-400'>MAURITIUS BY SBM</p>
-              </div>
+            <div className='flex items-center gap-3'>
+              <FinClubLogo className="w-auto h-8 text-blue-300" />
             </div>
             <Image src="/visa-logo.svg" alt="Visa" width={60} height={20} />
           </div>
-          <div className="space-y-4">
-            <p className="font-mono text-xl tracking-wider text-center text-slate-200">
+
+          {/* Card Number */}
+          <div className="space-y-1 text-center">
+            <p className="font-mono text-xl md:text-2xl tracking-wider text-slate-200">
                 {visaNumber}
             </p>
-            <div className="flex justify-between items-center text-sm">
+            <p className="text-xs text-slate-400">SBM (MAURITIUS) LTD</p>
+          </div>
+          
+          {/* Expiry and CVV */}
+          <div className="flex justify-between items-center text-sm">
+            <div className="flex items-center gap-4">
               <div>
                 <p className="text-xs text-slate-400">VALID THRU</p>
-                <p className="font-mono text-slate-200">10/28</p>
+                <p className="font-mono text-slate-200">{expiryDate}</p>
               </div>
               <div className="flex items-center gap-2">
                 <div>
                   <p className="text-xs text-slate-400">CVV</p>
-                  <p className="font-mono text-slate-200">{cvvVisible ? '352' : '***'}</p>
+                  <p className="font-mono text-slate-200">{cvvVisible ? cvv : '•••'}</p>
                 </div>
                  <Button
                   variant="ghost"
@@ -104,9 +109,11 @@ export function VirtualCard() {
                 </Button>
               </div>
             </div>
+             <p className="font-semibold text-slate-200 self-end">PATRICK I BERNARD</p>
           </div>
-           <div className="flex justify-between items-end">
-             <p className="font-semibold text-slate-200">PATRICK IAN BERNARD</p>
+
+           {/* NFC Icon */}
+           <div className="absolute bottom-4 right-6">
              <Wifi className={`h-8 w-8 transition-colors ${payPassEnabled ? 'text-white' : 'text-white/30'}`} />
            </div>
         </div>

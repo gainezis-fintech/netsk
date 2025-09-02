@@ -4,19 +4,32 @@ import { cn } from "@/lib/utils"
 export function FinClubLogo({ className, ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
+      viewBox="0 0 160 28"
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={cn("h-6 w-6", className)}
+      className={cn("font-sans", className)}
       {...props}
     >
-      <path d="M12 2L2 7l10 5 10-5-10-5z" />
-      <path d="M2 17l10 5 10-5" />
-      <path d="M2 12l10 5 10-5" />
+      <text 
+        x="0" 
+        y="22" 
+        fontFamily="Arial, sans-serif" 
+        fontSize="28" 
+        fontWeight="bold" 
+        fill="#2A3D95"
+      >
+        Fin
+      </text>
+      <circle cx="43" cy="5" r="5" fill="#2A3D95" />
+      <text 
+        x="58" 
+        y="22" 
+        fontFamily="Arial, sans-serif" 
+        fontSize="28" 
+        fontWeight="bold" 
+        fill="#E85A4F"
+      >
+        Club
+      </text>
     </svg>
   );
 }

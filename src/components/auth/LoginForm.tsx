@@ -58,7 +58,7 @@ export default function LoginForm() {
     setTimeout(() => {
       toast({
         title: 'Login Successful',
-        description: 'Welcome to Netskrill!',
+        description: 'Welcome to FinClub!',
       });
       router.push('/dashboard');
       setIsLoading(false);
@@ -70,7 +70,7 @@ export default function LoginForm() {
     setTimeout(() => {
       toast({
         title: 'Biometric Auth Successful',
-        description: 'Welcome back to Netskrill!',
+        description: 'Welcome back to FinClub!',
       });
       router.push('/dashboard');
       setIsLoading(false);
@@ -89,7 +89,7 @@ export default function LoginForm() {
   return (
     <Card className="w-full max-w-md shadow-2xl">
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-bold text-primary">Netskrill</CardTitle>
+        <CardTitle className="text-3xl font-bold text-primary">FinClub</CardTitle>
         <CardDescription>Secure Financial Platform</CardDescription>
       </CardHeader>
       <CardContent>

@@ -16,8 +16,8 @@ export default function LoginPage() {
       `}</style>
       <div className="relative w-full max-w-md space-y-6">
         <div className="absolute -top-20 left-1/2 -translate-x-1/2 transform">
-          <div className="bg-card rounded-full p-4 border shadow-lg">
-            <FinClubLogo className="h-12 w-12 text-primary" />
+          <div className="bg-card rounded-full p-4 border shadow-lg flex items-center justify-center">
+            <FinClubLogo className="h-12 w-auto" />
           </div>
         </div>
         <LoginForm />
