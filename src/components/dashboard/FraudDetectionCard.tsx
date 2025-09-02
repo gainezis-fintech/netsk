@@ -21,6 +21,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import type { DetectFraudOutput } from '@/ai/flows/fraud-detection';
 
 const formSchema = z.object({
   amount: z.coerce.number().positive({ message: 'Amount must be positive.' }),
@@ -28,9 +29,11 @@ const formSchema = z.object({
 
 export function FraudDetectionCard({ user }: { user: UserData }) {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<DetectFraudOutput | null>(null);
   const [showOtp, setShowOtp] = useState(false);
-  const [otp, setOtp] = useState('');
+  const [otpInput, setOtpInput] = useState('');
+  const [generatedOtp, setGeneratedOtp] = useState<string | null>(null);
+
   const { toast } = useToast();
 
   const averageTransactionAmount = user.bankAccounts.reduce((acc, curr) => acc + curr.balance, 0) / user.bankAccounts.length / 1000; // Simplified average
@@ -43,6 +46,7 @@ export function FraudDetectionCard({ user }: { user: UserData }) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     setResult(null);
+    setGeneratedOtp(null);
 
     const fraudCheckResult = await checkForFraud({
       userId: user.userId,
@@ -50,9 +54,20 @@ export function FraudDetectionCard({ user }: { user: UserData }) {
       averageTransactionAmount: averageTransactionAmount,
     });
     
+    if (fraudCheckResult.error) {
+       toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: fraudCheckResult.error,
+      });
+      setLoading(false);
+      return;
+    }
+
     setResult(fraudCheckResult);
 
     if (fraudCheckResult?.confirmationRequired) {
+      setGeneratedOtp(fraudCheckResult.otp || null);
       setShowOtp(true);
     } else if (!fraudCheckResult?.isFraud) {
        toast({
@@ -67,7 +82,7 @@ export function FraudDetectionCard({ user }: { user: UserData }) {
   }
 
   function handleOtpSubmit() {
-    if (otp === '123456') { // Simulate correct OTP
+    if (otpInput === generatedOtp) {
       toast({
         title: 'Transaction Confirmed',
         description: 'Your transaction has been verified and processed.',
@@ -75,7 +90,8 @@ export function FraudDetectionCard({ user }: { user: UserData }) {
       });
       setShowOtp(false);
       setResult(null);
-      setOtp('');
+      setOtpInput('');
+      setGeneratedOtp(null);
     } else {
       toast({
         variant: 'destructive',
@@ -141,12 +157,11 @@ export function FraudDetectionCard({ user }: { user: UserData }) {
           </DialogHeader>
           <div className="space-y-2">
             <Input 
-              placeholder="Enter OTP (e.g., 123456)" 
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+              placeholder="Enter OTP" 
+              value={otpInput}
+              onChange={(e) => setOtpInput(e.target.value)}
               className="font-mono text-center tracking-widest"
             />
-            <p className="text-xs text-muted-foreground text-center">Use '123456' for this demo.</p>
           </div>
           <DialogFooter>
             <Button onClick={handleOtpSubmit}>Confirm</Button>

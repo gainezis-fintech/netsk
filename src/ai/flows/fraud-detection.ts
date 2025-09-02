@@ -9,6 +9,9 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { sendSms } from '@/services/sms-service';
+import { generate } from 'otp-generator';
+import { userData } from '@/lib/data';
 
 const DetectFraudInputSchema = z.object({
   userId: z.string().describe('The ID of the user.'),
@@ -33,6 +36,7 @@ const DetectFraudOutputSchema = z.object({
   reason: z
     .string()
     .describe('The reason for flagging the transaction as potentially fraudulent.'),
+  otp: z.string().optional().describe('The One-Time Password sent to the user if confirmation is required.'),
 });
 export type DetectFraudOutput = z.infer<typeof DetectFraudOutputSchema>;
 
@@ -67,6 +71,28 @@ const detectFraudFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
+    
+    if (output?.confirmationRequired) {
+      const otp = generate(6, { 
+        upperCaseAlphabets: false, 
+        specialChars: false,
+        lowerCaseAlphabets: false,
+      });
+
+      const message = `FinClub Security: Your One-Time Password is ${otp}. Please use it to confirm your transaction.`;
+      
+      try {
+        await sendSms(userData.personalInfo.phone, message);
+        console.log(`OTP sent to ${userData.personalInfo.phone}`);
+        return { ...output, otp };
+      } catch (error) {
+        console.error('Failed to send OTP SMS:', error);
+        // In a real app, you might want to handle this error more gracefully
+        // For the demo, we'll proceed but without a real OTP
+        return { ...output, isFraud: true, reason: 'Fraud detected, but failed to send OTP for confirmation.' };
+      }
+    }
+
     return output!;
   }
 );
