@@ -27,7 +27,7 @@ export const userData: UserData = {
   userId: "patrick-bernard-001",
   personalInfo: {
     fullName: "Patrick Ian Bernard",
-    email: "patrick.bernard@example.com",
+    email: "patrickianbern1.nft@ud.me",
     phone: "+23054557219"
   },
   bankAccounts: [

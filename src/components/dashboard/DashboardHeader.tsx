@@ -28,7 +28,6 @@ export function DashboardHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10">
-                <AvatarImage src="https://picsum.photos/100/100" data-ai-hint="person face" alt="User Avatar" />
                 <AvatarFallback>PB</AvatarFallback>
               </Avatar>
             </Button>
@@ -40,7 +39,7 @@ export function DashboardHeader() {
                   Patrick Ian Bernard
                 </p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  patrick.bernard@example.com
+                  patrickianbern1.nft@ud.me
                 </p>
               </div>
             </DropdownMenuLabel>
