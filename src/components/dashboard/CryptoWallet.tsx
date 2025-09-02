@@ -1,9 +1,22 @@
+"use client";
+
 import type { CryptoWallet } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Bitcoin, Copy } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 export function CryptoWallet({ wallet }: { wallet: CryptoWallet }) {
+  const { toast } = useToast();
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(wallet.walletAddress);
+    toast({
+      title: 'Copied to Clipboard',
+      description: 'The wallet address has been copied.',
+    });
+  };
+
   return (
     <Card className="shadow-md">
       <CardHeader>
@@ -35,7 +48,7 @@ export function CryptoWallet({ wallet }: { wallet: CryptoWallet }) {
               variant="ghost"
               size="icon"
               className="h-7 w-7"
-              onClick={() => navigator.clipboard.writeText(wallet.walletAddress)}
+              onClick={copyToClipboard}
             >
               <Copy className="h-4 w-4" />
             </Button>

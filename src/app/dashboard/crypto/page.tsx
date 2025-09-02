@@ -1,3 +1,5 @@
+"use client";
+
 import { CryptoWallet } from '@/components/dashboard/CryptoWallet';
 import { userData } from '@/lib/data';
 
