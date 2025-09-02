@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { getCryptoQuoteTool } from '../tools/cmc-tool';
 
 const GetCryptoPriceInputSchema = z.object({
   symbol: z.string().describe('The cryptocurrency symbol (e.g., BTC, ETH).'),
@@ -28,7 +29,8 @@ const prompt = ai.definePrompt({
   name: 'getCryptoPricePrompt',
   input: {schema: GetCryptoPriceInputSchema},
   output: {schema: GetCryptoPriceOutputSchema},
-  prompt: `What is the current price of {{symbol}} in USD? Provide only the numerical value.`,
+  tools: [getCryptoQuoteTool],
+  prompt: `You are an expert financial assistant. Use the provided tools to find the current price of the cryptocurrency with the symbol {{symbol}} and return it in the format requested.`,
 });
 
 const getCryptoPriceFlow = ai.defineFlow(
@@ -39,6 +41,15 @@ const getCryptoPriceFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    
+    if (!output) {
+      throw new Error('The model did not return a price.');
+    }
+    
+    // The model's output from the tool might not be in the exact final format.
+    // We can extract the price and ensure it's a number.
+    const price = (output as any).price || 0;
+
+    return { price };
   }
 );
