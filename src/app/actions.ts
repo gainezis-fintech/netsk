@@ -2,6 +2,7 @@
 
 import { detectFraud, DetectFraudInput, DetectFraudOutput } from "@/ai/flows/fraud-detection";
 import { generateMemorablePassword } from "@/ai/flows/generate-password";
+import { getCryptoPrice, GetCryptoPriceInput } from "@/ai/flows/get-crypto-price";
 
 type FraudResult = DetectFraudOutput & { error?: string };
 
@@ -24,4 +25,14 @@ export async function generatePassword(): Promise<{ password?: string; error?: s
     console.error("Error in password generation flow:", error);
     return { error: "Failed to generate a password due to an internal error." };
   }
+}
+
+export async function fetchCryptoPrice(input: GetCryptoPriceInput): Promise<{ price?: number; error?: string }> {
+    try {
+        const result = await getCryptoPrice(input);
+        return { price: result.price };
+    } catch (error) {
+        console.error("Error in getCryptoPrice flow:", error);
+        return { error: "Failed to fetch crypto price due to an internal error." };
+    }
 }
