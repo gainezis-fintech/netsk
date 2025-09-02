@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from '../ui/select';
 
-const TransferForm = ({ title }: { title: string }) => (
+const TransferForm = ({ title, isMauritian = false }: { title: string, isMauritian?: boolean }) => (
   <div className="space-y-4">
     <h3 className="font-semibold">{title}</h3>
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -37,9 +37,9 @@ const TransferForm = ({ title }: { title: string }) => (
             <SelectValue placeholder="Select account..." />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="cba">CBA (**** 1234)</SelectItem>
-            <SelectItem value="bom">BoM (**** 5678)</SelectItem>
-            <SelectItem value="nab">NAB (**** 9012)</SelectItem>
+            <SelectItem value="cba">CBA (**** 3845)</SelectItem>
+            <SelectItem value="bom">BoM (**** 7960)</SelectItem>
+            <SelectItem value="nab">NAB (**** 7594)</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -48,8 +48,14 @@ const TransferForm = ({ title }: { title: string }) => (
         <Input id="to-account" placeholder="Enter account or BSB" />
       </div>
     </div>
+    {isMauritian && (
+        <div>
+            <Label htmlFor="swift-code">SWIFT Code</Label>
+            <Input id="swift-code" placeholder="e.g. STCBMUMU" />
+        </div>
+    )}
     <div>
-      <Label htmlFor="amount">Amount (AUD)</Label>
+      <Label htmlFor="amount">{`Amount (${isMauritian ? 'MUR' : 'AUD'})`}</Label>
       <Input id="amount" type="number" placeholder="0.00" />
     </div>
     <div>
@@ -89,7 +95,7 @@ export function TransferFunds() {
             <TransferForm title="Transfer to Another Australian Bank" />
           </TabsContent>
           <TabsContent value="mauritian-bank" className="pt-4">
-            <TransferForm title="Transfer to a Mauritian Bank" />
+            <TransferForm title="Transfer to a Mauritian Bank" isMauritian />
           </TabsContent>
         </Tabs>
       </CardContent>

@@ -33,19 +33,19 @@ export const userData: UserData = {
   bankAccounts: [
     {
       bank: "Commonwealth Bank of Australia",
-      accountNumber: "XXXX-XXXX-1234",
+      accountNumber: "BSB: 083-376, Acc: 46-457-3845",
       balance: 11650977.34,
       currency: "AUD"
     },
     {
       bank: "Bank of Melbourne",
-      accountNumber: "XXXX-XXXX-5678",
+      accountNumber: "BSB: 063-608, Acc: 1109-7960",
       balance: 18780004.40,
       currency: "AUD"
     },
     {
       bank: "National Australia Bank",
-      accountNumber: "XXXX-XXXX-9012",
+      accountNumber: "BSB: 063-262, Acc: 1080-7594",
       balance: 980440.93,
       currency: "AUD"
     }

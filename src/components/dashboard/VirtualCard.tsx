@@ -6,14 +6,58 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Wifi } from 'lucide-react';
+import { Switch } from '../ui/switch';
+import { Label } from '../ui/label';
+import { useToast } from '@/hooks/use-toast';
+
+// SBM BIN: 403281
+function generateVisaNumber() {
+    const bin = '403281';
+    let randomNumber = '';
+    for (let i = 0; i < 9; i++) {
+        randomNumber += Math.floor(Math.random() * 10);
+    }
+    const cardNumberWithoutLuhn = bin + randomNumber;
+
+    let sum = 0;
+    let shouldDouble = true;
+    for (let i = cardNumberWithoutLuhn.length - 1; i >= 0; i--) {
+        let digit = parseInt(cardNumberWithoutLuhn.charAt(i));
+        if (shouldDouble) {
+            digit *= 2;
+            if (digit > 9) {
+                digit -= 9;
+            }
+        }
+        sum += digit;
+        shouldDouble = !shouldDouble;
+    }
+    const luhnDigit = (10 - (sum % 10)) % 10;
+    return (cardNumberWithoutLuhn + luhnDigit).replace(/(.{4})/g, '$1 ').trim();
+}
+
 
 export function VirtualCard() {
   const [detailsVisible, setDetailsVisible] = useState(false);
+  const [payPassEnabled, setPayPassEnabled] = useState(false);
+  const { toast } = useToast();
+  
+  // We use useState to ensure the card number is only generated once per component mount
+  const [visaNumber] = useState(generateVisaNumber());
+
+  const handlePayPassToggle = (enabled: boolean) => {
+    setPayPassEnabled(enabled);
+    toast({
+        title: `PayPass ${enabled ? 'Enabled' : 'Disabled'}`,
+        description: `NFC payments are now ${enabled ? 'active' : 'inactive'}.`,
+    });
+  };
 
   return (
     <Card className="shadow-md">
@@ -33,8 +77,8 @@ export function VirtualCard() {
             <div className="flex justify-between items-center">
               <p className="font-mono text-lg tracking-wider">
                 {detailsVisible
-                  ? '4912 3456 7890 1234'
-                  : '**** **** **** 1234'}
+                  ? visaNumber
+                  : `**** **** **** ${visaNumber.slice(-4)}`}
               </p>
               <Button
                 variant="ghost"
@@ -49,16 +93,19 @@ export function VirtualCard() {
               <div>
                 <p className="text-xs">VALID THRU</p>
                 <p className="font-mono">
-                  {detailsVisible ? '12/28' : '**/**'}
+                  {detailsVisible ? '10/28' : '**/**'}
                 </p>
               </div>
               <div>
                 <p className="text-xs">CVV</p>
-                <p className="font-mono">{detailsVisible ? '123' : '***'}</p>
+                <p className="font-mono">{detailsVisible ? '352' : '***'}</p>
               </div>
             </div>
           </div>
-          <p className="font-semibold">PATRICK IAN BERNARD</p>
+           <div className="flex justify-between items-end">
+             <p className="font-semibold">PATRICK IAN BERNARD</p>
+             <Wifi className={`h-8 w-8 transition-colors ${payPassEnabled ? 'text-white' : 'text-white/30'}`} />
+           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -84,6 +131,16 @@ export function VirtualCard() {
           </Button>
         </div>
       </CardContent>
+       <CardFooter>
+        <div className="flex items-center space-x-2 w-full justify-center">
+            <Switch 
+                id="paypass-toggle" 
+                checked={payPassEnabled}
+                onCheckedChange={handlePayPassToggle}
+            />
+            <Label htmlFor="paypass-toggle">Enable PayPass (NFC)</Label>
+        </div>
+      </CardFooter>
     </Card>
   );
 }
