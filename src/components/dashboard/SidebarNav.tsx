@@ -18,13 +18,19 @@ import {
   Globe,
   Settings,
   LogOut,
+  ArrowRightLeft,
+  CreditCard,
+  ScanLine,
 } from 'lucide-react';
 import { Separator } from '../ui/separator';
 
 const menuItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '#', label: 'Bank Accounts', icon: Landmark },
-  { href: '#', label: 'Crypto Wallet', icon: Bitcoin },
+  { href: '/dashboard/accounts', label: 'Bank Accounts', icon: Landmark },
+  { href: '/dashboard/crypto', label: 'Crypto Wallet', icon: Bitcoin },
+  { href: '/dashboard/transfers', label: 'Transfers', icon: ArrowRightLeft },
+  { href: '/dashboard/cards', label: 'Cards', icon: CreditCard },
+  { href: '/dashboard/payments', label: 'Payments', icon: ScanLine },
   { href: '#', label: 'VPN', icon: Globe },
   { href: '#', label: 'Settings', icon: Settings },
 ];

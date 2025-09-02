@@ -6,7 +6,7 @@ import { ReactNode } from 'react';
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="h-screen overflow-hidden">
+      <div className="min-h-screen bg-background">
         <Sidebar>
           <SidebarNav />
         </Sidebar>
