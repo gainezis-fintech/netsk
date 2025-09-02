@@ -26,8 +26,9 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { BiometricLogin } from './BiometricLogin';
-import { KeyRound, Loader2, LogIn, Mail } from 'lucide-react';
+import { KeyRound, Loader2, LogIn, Mail, Sparkles } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { generatePassword } from '@/app/actions';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -41,7 +42,8 @@ const formSchema = z.object({
 export default function LoginForm() {
   const router = useRouter();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -53,7 +55,7 @@ export default function LoginForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
+    setIsSigningIn(true);
     // Simulate API call
     setTimeout(() => {
       toast({
@@ -61,36 +63,49 @@ export default function LoginForm() {
         description: 'Welcome to FinClub!',
       });
       router.push('/dashboard');
-      setIsLoading(false);
+      setIsSigningIn(false);
     }, 1500);
   }
 
   const handleBiometricSuccess = () => {
-    setIsLoading(true);
+    setIsSigningIn(true);
     setTimeout(() => {
       toast({
         title: 'Biometric Auth Successful',
         description: 'Welcome back to FinClub!',
       });
       router.push('/dashboard');
-      setIsLoading(false);
+      setIsSigningIn(false);
     }, 1000);
   };
   
-  const generateSystemPassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-    let password = '';
-    for (let i = 0; i < 16; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
+  const handleGeneratePassword = async () => {
+    setIsGenerating(true);
+    setGeneratedPassword(null);
+    const result = await generatePassword();
+    if (result.password) {
+      setGeneratedPassword(result.password);
+      toast({
+        title: 'AI Password Generated',
+        description: 'Your new secure password is ready.',
+      });
+    } else {
+       toast({
+        variant: 'destructive',
+        title: 'Generation Failed',
+        description: result.error || 'Could not generate a password at this time.',
+      });
     }
-    setGeneratedPassword(password);
+    setIsGenerating(false);
   };
+  
+  const isLoading = isSigningIn || isGenerating;
 
   return (
-    <Card className="w-full max-w-md shadow-2xl">
+    <Card className="w-full max-w-md shadow-2xl bg-card/80 backdrop-blur-sm border-white/20">
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-bold text-primary">FinClub</CardTitle>
-        <CardDescription>Secure Financial Platform</CardDescription>
+        <CardTitle className="text-3xl font-bold text-primary">Welcome Back</CardTitle>
+        <CardDescription>Sign in to access your FinClub account</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -130,31 +145,32 @@ export default function LoginForm() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? <Loader2 className="animate-spin" /> : <LogIn />}
+              {isSigningIn ? <Loader2 className="animate-spin" /> : <LogIn />}
               Sign In
             </Button>
           </form>
         </Form>
-        <Separator className="my-6" />
+        <Separator className="my-6 bg-white/20" />
         <div className="space-y-4">
           <BiometricLogin onAuthSuccess={handleBiometricSuccess} disabled={isLoading} />
-           <Button variant="outline" onClick={generateSystemPassword} className="w-full">
-            Generate System Password
+           <Button variant="outline" onClick={handleGeneratePassword} className="w-full" disabled={isLoading}>
+             {isGenerating ? <Loader2 className="animate-spin" /> : <Sparkles />}
+            Generate Password with AI
           </Button>
         </div>
         {generatedPassword && (
-          <Alert className="mt-4">
-            <KeyRound className="h-4 w-4" />
-            <AlertTitle>Generated Password</AlertTitle>
+          <Alert className="mt-4 bg-blue-900/50 border-blue-400/50 text-slate-200">
+            <KeyRound className="h-4 w-4 text-blue-300" />
+            <AlertTitle className="text-blue-200">Generated Secure Password</AlertTitle>
             <AlertDescription>
               Please save this password securely: <br />
-              <strong className="font-mono break-all">{generatedPassword}</strong>
+              <strong className="font-mono break-all text-white">{generatedPassword}</strong>
             </AlertDescription>
           </Alert>
         )}
       </CardContent>
       <CardFooter>
-        <p className="text-xs text-center text-muted-foreground w-full">
+        <p className="text-xs text-center text-slate-400 w-full">
           This is a simulated demo for investors. All data is mock.
         </p>
       </CardFooter>
