@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
+import QrScanner from 'react-qr-scanner';
 import {
   Card,
   CardContent,
@@ -9,8 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { QrCode, Smartphone, Wifi, Send, CameraOff } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { QrCode, Wifi, Send, CameraOff } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import {
   Dialog,
@@ -22,44 +22,46 @@ import {
   DialogClose,
 } from '../ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 
-const ScanToPayDialog = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+const ScanToPayDialog = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
   const { toast } = useToast();
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const getCameraPermission = async () => {
-      if (hasCameraPermission !== null) return; // Only run once
-
+  const handleScan = (data: any) => {
+    if (data) {
+      onOpenChange(false);
+      
+      // Simulate parsing QR code data
+      let parsedData;
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        setHasCameraPermission(true);
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-        setHasCameraPermission(false);
-        toast({
-          variant: 'destructive',
-          title: 'Camera Access Denied',
-          description: 'Please enable camera permissions in your browser settings to use this feature.',
-        });
+        parsedData = JSON.parse(data.text);
+      } catch (e) {
+        parsedData = { text: data.text };
       }
-    };
 
-    getCameraPermission();
-    
-    // Cleanup function to stop video stream
-    return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-      }
+      toast({
+        title: 'QR Code Scanned Successfully',
+        description: (
+          <div className="text-sm">
+            <p><strong>Bank:</strong> {parsedData.bank || 'MCB Mauritius'}</p>
+            <p><strong>Account:</strong> {parsedData.account || '000448971253'}</p>
+            <p><strong>Reference:</strong> {parsedData.ref || 'CafePayment'}</p>
+          </div>
+        ),
+        className: 'bg-accent text-accent-foreground',
+      });
     }
-  }, [hasCameraPermission, toast]);
+  };
+
+  const handleError = (err: any) => {
+    console.error(err);
+    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+      setError('Camera access was denied. Please enable camera permissions in your browser settings.');
+    } else {
+      setError('An error occurred while accessing the camera.');
+    }
+  };
 
   return (
     <DialogContent>
@@ -70,12 +72,22 @@ const ScanToPayDialog = () => {
         </DialogDescription>
       </DialogHeader>
       <div className="relative flex items-center justify-center bg-muted rounded-md overflow-hidden aspect-video">
-        <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted />
-        {hasCameraPermission === false && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80">
-             <CameraOff className="h-12 w-12 text-muted-foreground mb-4" />
-             <p className="text-muted-foreground">Camera access is required.</p>
+        {error ? (
+           <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 p-4">
+             <CameraOff className="h-12 w-12 text-destructive mb-4" />
+             <Alert variant="destructive">
+                <AlertTitle>Camera Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+             </Alert>
           </div>
+        ) : (
+          <QrScanner
+            delay={300}
+            onError={handleError}
+            onScan={handleScan}
+            style={{ width: '100%' }}
+            constraints={{ video: { facingMode: 'environment' } }}
+          />
         )}
       </div>
       <DialogClose asChild>
@@ -87,6 +99,7 @@ const ScanToPayDialog = () => {
 
 
 export function InStorePayments() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   return (
     <Card className="shadow-md">
       <CardHeader>
@@ -96,7 +109,7 @@ export function InStorePayments() {
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-6 sm:grid-cols-2">
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Card className="flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:shadow-lg transition-shadow">
               <QrCode className="h-12 w-12 mb-4 text-primary" />
@@ -107,7 +120,7 @@ export function InStorePayments() {
               <Button>Scan Code</Button>
             </Card>
           </DialogTrigger>
-          <ScanToPayDialog />
+          {isDialogOpen && <ScanToPayDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />}
         </Dialog>
         <Card className="flex flex-col items-center justify-center p-6 text-center">
           <Wifi className="h-12 w-12 mb-4 text-primary" />
