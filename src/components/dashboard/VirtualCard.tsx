@@ -15,6 +15,7 @@ import { Eye, EyeOff, Wifi } from 'lucide-react';
 import { Switch } from '../ui/switch';
 import { Label } from '../ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { FinClubLogo } from '../logo/FinClubLogo';
 
 // SBM BIN: 403281
 function generateVisaNumber() {
@@ -44,7 +45,7 @@ function generateVisaNumber() {
 
 
 export function VirtualCard() {
-  const [detailsVisible, setDetailsVisible] = useState(false);
+  const [cvvVisible, setCvvVisible] = useState(false);
   const [payPassEnabled, setPayPassEnabled] = useState(false);
   const { toast } = useToast();
   
@@ -68,42 +69,44 @@ export function VirtualCard() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="relative aspect-[1.586] w-full max-w-sm mx-auto rounded-xl bg-gradient-to-br from-primary via-blue-500 to-purple-600 text-white p-6 flex flex-col justify-between shadow-2xl">
+        <div className="relative aspect-[1.586] w-full max-w-sm mx-auto rounded-xl bg-gradient-to-br from-gray-900 via-blue-900 to-slate-900 text-slate-300 p-6 flex flex-col justify-between shadow-2xl">
           <div className="flex justify-between items-start">
-            <span className="font-bold text-xl">Netskrill</span>
+            <div className='flex items-center gap-2'>
+              <FinClubLogo className="w-10 h-10 text-blue-400" />
+              <div>
+                <span className="font-bold text-lg text-blue-400">FINCLUB</span>
+                <p className='text-xs text-slate-400'>MAURITIUS BY SBM</p>
+              </div>
+            </div>
             <Image src="/visa-logo.svg" alt="Visa" width={60} height={20} />
           </div>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <p className="font-mono text-lg tracking-wider">
-                {detailsVisible
-                  ? visaNumber
-                  : `**** **** **** ${visaNumber.slice(-4)}`}
-              </p>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-white hover:bg-white/20"
-                onClick={() => setDetailsVisible(!detailsVisible)}
-              >
-                {detailsVisible ? <EyeOff /> : <Eye />}
-              </Button>
-            </div>
-            <div className="flex gap-4 text-sm">
+          <div className="space-y-4">
+            <p className="font-mono text-xl tracking-wider text-center text-slate-200">
+                {visaNumber}
+            </p>
+            <div className="flex justify-between items-center text-sm">
               <div>
-                <p className="text-xs">VALID THRU</p>
-                <p className="font-mono">
-                  {detailsVisible ? '10/28' : '**/**'}
-                </p>
+                <p className="text-xs text-slate-400">VALID THRU</p>
+                <p className="font-mono text-slate-200">10/28</p>
               </div>
-              <div>
-                <p className="text-xs">CVV</p>
-                <p className="font-mono">{detailsVisible ? '352' : '***'}</p>
+              <div className="flex items-center gap-2">
+                <div>
+                  <p className="text-xs text-slate-400">CVV</p>
+                  <p className="font-mono text-slate-200">{cvvVisible ? '352' : '***'}</p>
+                </div>
+                 <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-slate-300 hover:bg-white/10"
+                  onClick={() => setCvvVisible(!cvvVisible)}
+                >
+                  {cvvVisible ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </Button>
               </div>
             </div>
           </div>
            <div className="flex justify-between items-end">
-             <p className="font-semibold">PATRICK IAN BERNARD</p>
+             <p className="font-semibold text-slate-200">PATRICK IAN BERNARD</p>
              <Wifi className={`h-8 w-8 transition-colors ${payPassEnabled ? 'text-white' : 'text-white/30'}`} />
            </div>
         </div>
